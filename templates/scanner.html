@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Scanner Workspace — Smart Document Scanner{% endblock %}
+{% block nav_scanner %}is-active{% endblock %}
+
+{% block content %}
+<section class="scanner-shell container" id="scanner-root">
+  <header class="scanner-top">
+    <div>
+      <h1>Scanner Workspace</h1>
+      <p class="muted">Upload, detect, straighten, enhance — then export your scan.</p>
+    </div>
+    <div class="scanner-top-actions">
+      <span id="scan-status-chip" class="chip" hidden></span>
+      <a class="btn btn-outline btn-sm" href="{% url 'scanner:history' %}">History</a>
+    </div>
+  </header>
+
+  <div id="scan-messages" class="scanner-alert" role="alert" aria-live="assertive" hidden></div>
+
+  <div class="empty-state card" id="empty-state" {% if initial %}hidden{% endif %}>
+    <div class="dropzone dropzone-lg" id="scanner-dropzone" tabindex="0" role="button"
+         aria-label="Upload a document image to start scanning">
+      <input type="file" id="scanner-file-input" class="visually-hidden-input"
+             accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+      <span class="dropzone-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3.5"/><path d="m7.5 8 4.5-4.5L16.5 8"/><path d="M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></svg>
+      </span>
+      <p class="dropzone-title">Upload a document to begin</p>
+      <p class="dropzone-sub">Drag &amp; drop an image, or tap to browse your files</p>
+      <span class="btn btn-primary dropzone-browse" aria-hidden="true">Choose Image</span>
+      <p class="dropzone-hint">JPG · PNG · WebP — up to {{ max_upload_mb|default:"12" }} MB</p>
+    </div>
+    <p class="upload-error" id="scanner-upload-error" role="alert" hidden></p>
+  </div>
+
+  <div class="workspace-grid" id="workspace" {% if not initial %}hidden{% endif %}>
+
+    <section class="panel" aria-labelledby="source-heading">
+      <div class="panel-head">
+        <h2 id="source-heading">Original</h2>
+        <span class="muted" id="source-meta">No image loaded</span>
+      </div>
+
+      <div class="preview-stage" id="source-stage">
+        <div class="preview-frame" id="source-frame">
+          <img id="source-image" alt="Original uploaded document" draggable="false">
+          <svg id="quad-overlay" aria-hidden="true">
+            <polygon id="quad-polygon" points=""></polygon>
+          </svg>
+          <div class="corner-handles" id="corner-handles">
+            <button type="button" class="corner-handle" data-corner="0" aria-label="Drag or use arrow keys to move corner 1 (top-left)"></button>
+            <button type="button" class="corner-handle" data-corner="1" aria-label="Drag or use arrow keys to move corner 2 (top-right)"></button>
+            <button type="button" class="corner-handle" data-corner="2" aria-label="Drag or use arrow keys to move corner 3 (bottom-right)"></button>
+            <button type="button" class="corner-handle" data-corner="3" aria-label="Drag or use arrow keys to move corner 4 (bottom-left)"></button>
+          </div>
+          <div class="stage-spinner" id="source-spinner" hidden><span class="spinner" aria-hidden="true"></span><span>Processing…</span></div>
+        </div>
+        <p class="stage-hint" id="stage-hint" hidden>Drag the corner handles, then press <strong>Apply Crop</strong>.</p>
+      </div>
+
+      <div class="panel-toolbar" role="group" aria-label="Detection and crop controls">
+        <button type="button" class="btn btn-outline btn-sm" id="btn-detect">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+          Auto Detect
+        </button>
+        <button type="button" class="btn btn-outline btn-sm" id="btn-manual" aria-pressed="false">Adjust Corners</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-apply-crop" disabled>Apply Crop</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-reset-crop" disabled>Reset Crop</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-full-image">Use Full Image</button>
+        <span class="toolbar-spacer"></span>
+        <button type="button" class="btn btn-ghost btn-sm danger" id="btn-remove">Remove Page</button>
+      </div>
+      <p class="panel-note" id="detect-feedback"></p>
+    </section>
+
+    <section class="panel" aria-labelledby="controls-heading">
+      <div class="panel-head">
+        <h2 id="controls-heading">Enhance &amp; Filters</h2>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-reset-enh">Reset</button>
+      </div>
+
+      <div class="control-group">
+        <label class="slider-label" for="inp-brightness">Brightness <output id="out-brightness">1.00</output></label>
+        <input type="range" id="inp-brightness" min="0.5" max="1.5" step="0.01" value="1">
+      </div>
+      <div class="control-group">
+        <label class="slider-label" for="inp-contrast">Contrast <output id="out-contrast">1.00</output></label>
+        <input type="range" id="inp-contrast" min="0.5" max="1.5" step="0.01" value="1">
+      </div>
+      <div class="control-group">
+        <label class="slider-label" for="inp-sharpness">Sharpness <output id="out-sharpness">0.00</output></label>
+        <input type="range" id="inp-sharpness" min="0" max="2" step="0.05" value="0">
+      </div>
+
+      <div class="switch-row">
+        <label class="switch">
+          <input type="checkbox" id="inp-denoise">
+          <span class="switch-track" aria-hidden="true"></span>
+          Noise reduction
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="inp-clahe" checked>
+          <span class="switch-track" aria-hidden="true"></span>
+          CLAHE contrast
+        </label>
+      </div>
+
+      <h3 class="control-subheading">Scan filter</h3>
+      <div class="filter-chips" id="filter-chips" role="group" aria-label="Scan filters">
+        <button type="button" class="filter-chip is-selected" data-filter="original" aria-pressed="true">Original Color</button>
+        <button type="button" class="filter-chip" data-filter="grayscale" aria-pressed="false">Grayscale</button>
+        <button type="button" class="filter-chip" data-filter="bw" aria-pressed="false">Black &amp; White</button>
+        <button type="button" class="filter-chip" data-filter="adaptive" aria-pressed="false">Adaptive Threshold</button>
+        <button type="button" class="filter-chip" data-filter="enhanced" aria-pressed="false">Enhanced Color</button>
+      </div>
+
+      <h3 class="control-subheading">Image quality</h3>
+      <ul class="quality-list" id="quality-list" aria-live="polite">
+        <li class="muted tiny">Upload an image to see quality feedback.</li>
+      </ul>
+    </section>
+
+    <section class="panel panel-compare" aria-labelledby="compare-heading">
+      <div class="panel-head">
+        <h2 id="compare-heading">Before / After</h2>
+        <span class="chip chip-ok" id="compare-status" hidden>Processed</span>
+      </div>
+      <div class="compare-grid">
+        <figure class="compare-cell">
+          <figcaption>Original</figcaption>
+          <div class="compare-frame">
+            <img id="before-image" alt="Original document before processing" draggable="false">
+            <span class="compare-dims" id="before-dims"></span>
+          </div>
+        </figure>
+        <figure class="compare-cell">
+          <figcaption>Scanned</figcaption>
+          <div class="compare-frame">
+            <img id="after-image" alt="Processed document scan" draggable="false">
+            <span class="compare-dims" id="after-dims"></span>
+            <div class="stage-spinner overlay-spinner" id="after-spinner" hidden><span class="spinner" aria-hidden="true"></span><span>Processing…</span></div>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="export-heading">
+      <div class="panel-head"><h2 id="export-heading">Export</h2></div>
+      <div class="export-row" role="group" aria-label="Export format">
+        <button type="button" class="format-btn is-selected" data-format="jpg" aria-pressed="true">JPG</button>
+        <button type="button" class="format-btn" data-format="png" aria-pressed="false">PNG</button>
+        <button type="button" class="format-btn" data-format="pdf" aria-pressed="false">PDF</button>
+      </div>
+      <p class="muted tiny" id="export-note">Choose a format, then download your scan.</p>
+      <button type="button" class="btn btn-primary btn-block" id="btn-download">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5V15"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4 19h16"/></svg>
+        Download Scan
+      </button>
+    </section>
+
+    <section class="panel panel-enhance" id="enhance-panel" aria-labelledby="enhance-heading">
+      <div class="panel-head">
+        <h2 id="enhance-heading">Enhance Old Image</h2>
+        <span class="chip" id="enhance-status" hidden></span>
+      </div>
+      <p class="muted tiny enhance-intro">
+        Restore blurry, faded, dark or noisy photos with one-tap presets.
+        The original image is never changed.
+      </p>
+
+      <h3 class="control-subheading">Preset</h3>
+      <div class="restore-chips" id="restore-chips" role="group" aria-label="Enhancement presets">
+        <button type="button" class="restore-chip is-selected" data-preset="natural" aria-pressed="true">Natural</button>
+        <button type="button" class="restore-chip" data-preset="document" aria-pressed="false">Document</button>
+        <button type="button" class="restore-chip" data-preset="denoise" aria-pressed="false">Denoise</button>
+        <button type="button" class="restore-chip" data-preset="sharpen" aria-pressed="false">Sharpen</button>
+      </div>
+
+      <div class="control-group">
+        <label class="slider-label" for="inp-restore-strength">Strength <output id="out-restore-strength">50%</output></label>
+        <input type="range" id="inp-restore-strength" min="0" max="1" step="0.05" value="0.5">
+      </div>
+
+      <div class="export-row" role="group" aria-label="Enhanced export format">
+        <button type="button" class="restore-format-btn is-selected" data-format="jpg" aria-pressed="true">JPG</button>
+        <button type="button" class="restore-format-btn" data-format="png" aria-pressed="false">PNG</button>
+      </div>
+
+      <button type="button" class="btn btn-primary btn-block" id="btn-enhance">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.5 6.5L22 12l-6.5 2.5L13 21l-2.5-6.5L4 12l6.5-2.5z"/></svg>
+        Enhance Image
+      </button>
+      <button type="button" class="btn btn-outline btn-block btn-sm" id="btn-enhance-download" disabled style="margin-top:8px;">
+        Download Enhanced
+      </button>
+
+      <div class="enhance-compare" id="enhance-compare" hidden>
+        <figure class="compare-cell">
+          <figcaption>Before</figcaption>
+          <div class="compare-frame">
+            <img id="enhance-before" alt="Original image before enhancement" draggable="false">
+            <div class="stage-spinner overlay-spinner" id="enhance-spinner" hidden><span class="spinner" aria-hidden="true"></span><span>Enhancing…</span></div>
+          </div>
+        </figure>
+        <figure class="compare-cell">
+          <figcaption>After</figcaption>
+          <div class="compare-frame">
+            <img id="enhance-after" alt="Enhanced image" draggable="false">
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <section class="panel panel-pages" aria-labelledby="pages-heading">
+      <div class="panel-head">
+        <h2 id="pages-heading">Pages <span class="muted" id="pages-count"></span></h2>
+        <div class="panel-head-actions">
+          <button type="button" class="btn btn-outline btn-sm" id="btn-add-page">+ Add Page</button>
+          <input type="file" id="page-file-input" class="visually-hidden-input"
+                 accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+        </div>
+      </div>
+      <ol class="pages-strip" id="pages-strip" aria-label="Document pages"></ol>
+      <div class="pdf-export-row">
+        <p class="muted tiny">Combine every page — portrait or landscape — into one PDF.</p>
+        <button type="button" class="btn btn-outline btn-sm" id="btn-pdf-all">
+          Export All Pages as PDF
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5V15"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4 19h16"/></svg>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  {% if initial %}{{ initial|json_script:"initial-scan" }}{% endif %}
+  {{ config|json_script:"scanner-config" }}
+  {{ pages|json_script:"initial-pages" }}
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/scanner.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/scanner.js' %}" defer></script>
+{% endblock %}

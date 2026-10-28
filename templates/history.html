@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Scan History — Smart Document Scanner{% endblock %}
+{% block nav_history %}is-active{% endblock %}
+
+{% block content %}
+<section class="section container history-section">
+  <header class="section-head section-head-left">
+    <div>
+      <span class="section-eyebrow">Scan History</span>
+      <h2 class="section-title">Your scans</h2>
+      <p class="section-sub">
+        {% if user.is_authenticated %}
+          Signed in as <strong>{{ user.username }}</strong> — these scans belong to your account.
+        {% else %}
+          Private to this browser session. <a href="{% url 'scanner:login' %}">Log in</a> to keep history across devices.
+        {% endif %}
+      </p>
+    </div>
+    <div class="history-head-actions">
+      <a class="btn btn-primary" href="{% url 'scanner:scanner_view' %}">New Scan</a>
+      {% if items %}
+        <form method="post" action="{% url 'scanner:history_clear_all' %}" class="inline-form"
+              onsubmit="return confirm('Delete ALL {{ items|length }} scan(s) and their files? This cannot be undone.');">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline btn-sm danger">Clear All History</button>
+        </form>
+      {% endif %}
+    </div>
+  </header>
+
+  {% if items %}
+    <ul class="history-grid">
+      {% for item in items %}
+        <li class="history-card card">
+          <a class="history-thumb" href="{% url 'scanner:scanner_view' %}?scan={{ item.id }}" aria-label="Open scan {{ item.filename }} in the scanner">
+            <img src="{{ item.thumb_url }}" alt="Thumbnail of scan {{ item.filename }}" loading="lazy">
+            <span class="chip {% if item.status == 'completed' %}chip-ok{% else %}chip-warn{% endif %}">{{ item.status }}</span>
+          </a>
+          <div class="history-body">
+            <p class="history-name" title="{{ item.filename }}">{{ item.filename }}</p>
+            <p class="muted tiny">
+              {{ item.created_at|date:"M j, Y H:i" }}
+              {% if item.width and item.height %} · {{ item.width }}×{{ item.height }}{% endif %}
+            </p>
+            <p class="muted tiny">
+              {% if item.filter %}Filter: {{ item.filter }}{% else %}Not processed yet{% endif %}
+              {% if item.export_format %} · Exported: {{ item.export_format|upper }}{% endif %}
+            </p>
+            <div class="history-actions">
+              <a class="btn btn-outline btn-sm" href="{% url 'scanner:scanner_view' %}?scan={{ item.id }}">Open</a>
+              {% if item.has_processed %}
+                <a class="btn btn-ghost btn-sm" href="{{ item.download_url }}">Download</a>
+              {% endif %}
+              <form method="post" action="{% url 'scanner:history_delete' item.id %}" class="inline-form"
+                    onsubmit="return confirm('Delete this scan permanently?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-ghost btn-sm danger">Delete</button>
+              </form>
+            </div>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="empty-state card">
+      <p class="dropzone-title">No scans yet</p>
+      <p class="section-sub">Scans you upload will appear here — visible only to this browser session{% if not user.is_authenticated %} (or your account after logging in){% endif %}.</p>
+      <a class="btn btn-primary" href="{% url 'scanner:scanner_view' %}">Scan your first document</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

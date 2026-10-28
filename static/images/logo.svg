@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 96" width="320" height="96" role="img" aria-label="Smart Document Scanner logo">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="320" y2="96" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4f46e5"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="72" height="72" rx="20" fill="url(#lg)"/>
+  <path d="M34 42v-5.4c0-2 1.6-3.6 3.6-3.6H43M62 42v-5.4c0-2-1.6-3.6-3.6-3.6H53M34 54v5.4c0 2 1.6 3.6 3.6 3.6H43M62 54v5.4c0 2-1.6 3.6-3.6 3.6H53" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <rect x="42" y="42" width="20" height="20" rx="4" fill="#fff" opacity=".95"/>
+  <path d="M46.5 48h11M46.5 52.5h11M46.5 57h7" stroke="#4f46e5" stroke-width="2.4" stroke-linecap="round"/>
+  <text x="100" y="50" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="800" fill="#0f172a">Smart</text>
+  <text x="167" y="50" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="800" fill="#4f46e5">Scan</text>
+  <text x="100" y="72" font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#5b6b84">Document Scanner</text>
+</svg>

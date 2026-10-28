@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Create account — Smart Document Scanner{% endblock %}
+
+{% block content %}
+<section class="section container auth-section">
+  <div class="card auth-card">
+    <h1>Create your account</h1>
+    <p class="section-sub">Optional — the scanner works fully without an account. Registering keeps your history across devices.</p>
+
+    {% if form.errors %}
+      <div class="alert alert-error" role="alert">
+        <ul class="error-list">
+          {% for field, errors in form.errors.items %}
+            {% for error in errors %}{% if field != "__all__" %}<li><strong>{{ field|title }}:</strong> {% endif %}{{ error }}</li>{% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form method="post" class="auth-form" novalidate>
+      {% csrf_token %}
+      <div class="control-group">
+        <label class="slider-label" for="id_username">Username</label>
+        <input type="text" name="username" id="id_username" class="text-input" autocomplete="username" required value="{{ form.username.value|default:'' }}">
+        <p class="muted tiny">Letters, digits and @/./+/-/_ only.</p>
+      </div>
+      <div class="control-group">
+        <label class="slider-label" for="id_email">Email <span class="muted">(optional)</span></label>
+        <input type="email" name="email" id="id_email" class="text-input" autocomplete="email" value="{{ form.email.value|default:'' }}">
+      </div>
+      <div class="control-group">
+        <label class="slider-label" for="id_password1">Password</label>
+        <input type="password" name="password1" id="id_password1" class="text-input" autocomplete="new-password" required>
+      </div>
+      <div class="control-group">
+        <label class="slider-label" for="id_password2">Confirm password</label>
+        <input type="password" name="password2" id="id_password2" class="text-input" autocomplete="new-password" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Create account</button>
+    </form>
+
+    <p class="auth-alt">Already registered? <a href="{% url 'scanner:login' %}">Log in</a></p>
+  </div>
+</section>
+{% endblock %}

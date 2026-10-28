@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Server error — Smart Document Scanner{% endblock %}
+{% block content %}
+<section class="section container error-section">
+  <div class="card error-card">
+    <p class="error-code">500</p>
+    <h1>Something went wrong</h1>
+    <p class="section-sub">An unexpected error occurred on our side. Please try again in a moment.</p>
+    <div class="hero-cta-row center">
+      <a class="btn btn-primary" href="{% url 'scanner:home' %}">Go Home</a>
+      <a class="btn btn-outline" href="{% url 'scanner:scanner_view' %}">Open Scanner</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

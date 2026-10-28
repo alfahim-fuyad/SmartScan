@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Smart Document Scanner — Turn Any Document Into a Perfect Scan{% endblock %}
+{% block nav_home %}is-active{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-backdrop" aria-hidden="true">
+    <span class="hero-orb orb-a"></span>
+    <span class="hero-orb orb-b"></span>
+  </div>
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <span class="hero-badge anim a1">
+        <span class="badge-dot" aria-hidden="true"></span>
+        Smart Document Scanner
+      </span>
+      <h1 class="hero-title anim a2">Turn Any Document Into a&nbsp;<span class="text-gradient">Perfect Scan</span></h1>
+      <p class="hero-subtitle anim a3">
+        Upload a photo of any document and get a clean, straightened,
+        enhanced scan in seconds — no app install, no account required.
+      </p>
+      <div class="hero-cta-row anim a4">
+        <a class="btn btn-primary btn-lg" href="{% url 'scanner:scanner_view' %}">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="m8.5 12 2.5 2.5L16 9.5"/></svg>
+          Start Scanning
+        </a>
+        <a class="btn btn-outline btn-lg" href="#features">Explore Features</a>
+      </div>
+      <ul class="hero-facts anim a5" aria-label="Supported formats and limits">
+        <li>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4.5 12.5 5 5 10-11"/></svg>
+          JPG · PNG · WebP
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4.5 12.5 5 5 10-11"/></svg>
+          Up to {{ max_upload_mb }} MB
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4.5 12.5 5 5 10-11"/></svg>
+          No account required
+        </li>
+      </ul>
+    </div>
+
+    <div class="hero-visual anim a3">
+      <div class="hero-scan-card">
+        <img src="{% static 'images/scan.png' %}" alt="Document scanning in progress" class="hero-scan-img" width="768" height="512">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="container">
+    <header class="section-head">
+      <span class="section-eyebrow">Features</span>
+      <h2 class="section-title">Everything a document deserves</h2>
+      <p class="section-sub">Powerful tools that turn an ordinary photo into a clean, readable scan.</p>
+    </header>
+
+    <div class="feature-grid">
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 8V6a3 3 0 0 1 3-3h2M16 3h2a3 3 0 0 1 3 3v2M21 16v2a3 3 0 0 1-3 3h-2M8 21H6a3 3 0 0 1-3-3v-2"/><path d="m8.5 12 2.5 2.5L16.5 9"/></svg></span>
+        <h3>Automatic Document Detection</h3>
+        <p>The scanner finds the document boundary automatically — even on cluttered desks or uneven backgrounds.</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg></span>
+        <h3>Smart Cropping</h3>
+        <p>Prefer manual control? Drag the four corner handles to crop exactly what you need.</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m21.5 8.5-9-5.5a1 1 0 0 0-1 0l-9 5.5L12 14l9.5-5.5Z"/><path d="M2.5 8.5v7l9 5.5v-7"/><path d="m21.5 8.5v7L12 21v-7"/></svg></span>
+        <h3>Perspective Correction</h3>
+        <p>Turn tilted, trapezoidal photos into straight, perfectly aligned pages with one click.</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1.5 14h5M9.5 8h5M17.5 16h5"/></svg></span>
+        <h3>Image Enhancement</h3>
+        <p>Adjust brightness, contrast and sharpness to make every scan crisp and easy to read.</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.5 6.5L22 12l-6.5 2.5L13 21l-2.5-6.5L4 12l6.5-2.5z"/></svg></span>
+        <h3>Enhance Old Images</h3>
+        <p>Restore blurry, faded, dark or noisy photos with one-tap presets designed for old documents.</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2Z"/><path d="M14 2v6h6"/><path d="M12 12v6"/><path d="m9 15 3 3 3-3"/></svg></span>
+        <h3>PDF and Image Export</h3>
+        <p>Download your scan as a JPG or PNG, or combine multiple pages into a single PDF.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section section-tinted" id="how-it-works">
+  <div class="container">
+    <header class="section-head">
+      <span class="section-eyebrow">How It Works</span>
+      <h2 class="section-title">From camera roll to clean scan in four steps</h2>
+    </header>
+    <ol class="steps">
+      <li class="step">
+        <span class="step-num">1</span>
+        <div>
+          <h3>Upload</h3>
+          <p>Select a document photo from your device — JPG, PNG or WebP up to {{ max_upload_mb }} MB.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-num">2</span>
+        <div>
+          <h3>Detect</h3>
+          <p>The scanner finds the document boundary automatically. Adjust corners manually any time.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-num">3</span>
+        <div>
+          <h3>Enhance</h3>
+          <p>Straighten the page, then fine-tune brightness, contrast and filters to your liking.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-num">4</span>
+        <div>
+          <h3>Download</h3>
+          <p>Export the finished scan as a JPG, PNG — or combine pages into one PDF.</p>
+        </div>
+      </li>
+    </ol>
+
+    <div class="cta-band">
+      <div>
+        <h2>Ready to scan something?</h2>
+        <p>Free, needs no account, and keeps your scans private.</p>
+      </div>
+      <a class="btn btn-primary btn-lg" href="{% url 'scanner:scanner_view' %}">Open the Scanner
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

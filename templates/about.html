@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About — Smart Document Scanner{% endblock %}
+{% block nav_about %}is-active{% endblock %}
+
+{% block content %}
+<section class="section container about-section">
+  <header class="section-head section-head-left">
+    <div>
+      <span class="section-eyebrow">About the project</span>
+      <h2 class="section-title">Classical image processing, applied end&nbsp;to&nbsp;end</h2>
+      <p class="section-sub">
+        Smart Document Scanner is a course project for <strong>CSE 438 — Digital Image
+        Processing Lab</strong>. It demonstrates how far traditional techniques — no machine
+        learning, no OCR, no external AI services — can go toward turning an ordinary
+        photograph into a clean, readable digital scan.
+      </p>
+    </div>
+  </header>
+
+  <div class="about-grid">
+    <article class="card about-card">
+      <h3>The pipeline</h3>
+      <p>
+        Every scan follows the same deterministic path. The uploaded photo is safely decoded
+        and validated, then a working copy is converted to grayscale and smoothed with a
+        Gaussian kernel so that Canny edge detection concentrates on real boundaries.
+        External contours are extracted, sorted by area and simplified with polygon
+        approximation until a plausible four-corner document outline appears.
+      </p>
+      <p>
+        Those corners drive a perspective transformation
+        (<code>cv2.getPerspectiveTransform</code> + <code>cv2.warpPerspective</code>) that
+        re-projects the tilted paper onto a straight rectangle. Enhancement operators —
+        brightness/contrast scaling, unsharp masking, non-local-means or bilateral denoising,
+        and CLAHE — are applied to the warped page, and the chosen filter (grayscale, Otsu
+        black &amp; white with morphological cleanup, adaptive threshold, or enhanced color)
+        finishes the job. Exports re-run this exact pipeline at full resolution.
+      </p>
+    </article>
+
+    <article class="card about-card">
+      <h3>Engineering choices</h3>
+      <p>
+        The backend is Django 5.2 LTS with a strict separation between views and reusable
+        OpenCV service modules, which keeps every technique unit-testable. Uploads are
+        validated on the server — magic bytes, Pillow verification, a full OpenCV decode,
+        and hard limits on size and pixel count — and stored under generated filenames, so
+        client-supplied names never touch the filesystem. Scans are private to the browser
+        session that created them; logging in optionally attaches history to an account.
+      </p>
+      <p>
+        Static assets ship through WhiteNoise with compression, the app is served by Gunicorn,
+        and metadata lives in PostgreSQL (Neon in production) while image binaries stay on
+        disk — never inside database rows.
+      </p>
+    </article>
+
+    <article class="card about-card">
+      <h3>What this project is not</h3>
+      <p>
+        Detection is heuristic: unusual lighting, low contrast against the background, or
+        cropped-away edges can prevent automatic boundary detection. In those cases the UI
+        explains what happened and offers manual corner adjustment or full-image fallback.
+        Quality checks (blur, brightness, contrast, resolution) are advisory heuristics, not
+        guarantees. No PDF input or OCR is supported, and no AI models are used anywhere.
+      </p>
+    </article>
+
+    <article class="card about-card">
+      <h3>Technology credits</h3>
+      <ul class="credits-list">
+        <li><strong>Python 3.12</strong> — implementation language</li>
+        <li><strong>Django 5.2 LTS</strong> — web framework, ORM, auth, sessions</li>
+        <li><strong>OpenCV</strong> — edges, contours, transforms, filters</li>
+        <li><strong>NumPy</strong> — array processing</li>
+        <li><strong>Pillow</strong> — image verification and formats</li>
+        <li><strong>ReportLab</strong> — PDF generation</li>
+        <li><strong>PostgreSQL + Neon</strong> — production database</li>
+        <li><strong>WhiteNoise + Gunicorn + Render</strong> — static files and hosting</li>
+      </ul>
+    </article>
+  </div>
+
+  <div class="cta-band">
+    <div>
+      <h2>See it in action</h2>
+      <p>Upload a photo of any document and watch the pipeline work.</p>
+    </div>
+    <a class="btn btn-primary btn-lg" href="{% url 'scanner:scanner_view' %}">Open the Scanner</a>
+  </div>
+</section>
+{% endblock %}

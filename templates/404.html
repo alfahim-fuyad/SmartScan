@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Page not found — Smart Document Scanner{% endblock %}
+{% block content %}
+<section class="section container error-section">
+  <div class="card error-card">
+    <p class="error-code">404</p>
+    <h1>Page not found</h1>
+    <p class="section-sub">The page you're looking for doesn't exist or may have moved.</p>
+    <div class="hero-cta-row center">
+      <a class="btn btn-primary" href="{% url 'scanner:home' %}">Go Home</a>
+      <a class="btn btn-outline" href="{% url 'scanner:scanner_view' %}">Open Scanner</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
